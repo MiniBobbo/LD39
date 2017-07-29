@@ -34,6 +34,30 @@ class ApplicationMain {
 		types.push (lime.Assets.AssetType.TEXT);
 		
 		
+		urls.push ("assets/data/levels/test/1.tmx");
+		types.push (lime.Assets.AssetType.TEXT);
+		
+		
+		urls.push ("assets/data/levels/test/2.tmx");
+		types.push (lime.Assets.AssetType.TEXT);
+		
+		
+		urls.push ("assets/data/levels/test/3.tmx");
+		types.push (lime.Assets.AssetType.TEXT);
+		
+		
+		urls.push ("assets/data/levels/test/32blocks.png");
+		types.push (lime.Assets.AssetType.IMAGE);
+		
+		
+		urls.push ("assets/images/atlas.json");
+		types.push (lime.Assets.AssetType.TEXT);
+		
+		
+		urls.push ("assets/images/atlas.png");
+		types.push (lime.Assets.AssetType.IMAGE);
+		
+		
 		urls.push ("assets/images/images-go-here.txt");
 		types.push (lime.Assets.AssetType.TEXT);
 		
@@ -131,7 +155,7 @@ class ApplicationMain {
 		
 		config = {
 			
-			build: "2",
+			build: "108",
 			company: "HaxeFlixel",
 			file: "LD39",
 			fps: 60,
@@ -149,13 +173,13 @@ class ApplicationMain {
 					display: 0,
 					fullscreen: false,
 					hardware: false,
-					height: 480,
+					height: 600,
 					parameters: "{}",
 					resizable: false,
 					stencilBuffer: true,
 					title: "LD39",
 					vsync: true,
-					width: 640,
+					width: 800,
 					x: null,
 					y: null
 				},
@@ -173,7 +197,7 @@ class ApplicationMain {
 		
 		#if (js && html5)
 		#if (munit || utest)
-		openfl.Lib.embed (null, 640, 480, "000000");
+		openfl.Lib.embed (null, 800, 600, "000000");
 		#end
 		#else
 		create ();

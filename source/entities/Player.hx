@@ -13,7 +13,7 @@ import inputhelper.InputHelper;
  */
 class Player extends Entity 
 {
-	var GRAVITY:Float = 400;
+	public var GRAVITY:Float = 400;
 	var JUMP_STRENGTH:Float = 300;
 	var JUMP_TIME:Float = .5;
 	var MOVEMENT_ACCEL:Float = 1200;
@@ -38,8 +38,8 @@ class Player extends Entity
 		animation.addByPrefix('idle', 'robot_idle', 30);
 		animation.play('idle');
 		setSize(30, 30);
-		
-		//Set the player's settigns here.
+		centerOffsets();
+		//Set the player's settings here.
 		//Gravity.
 		acceleration.y = GRAVITY;
 		maxVelocity.set(MOVEMENT_MAX_X, MOVEMENT_MAX_Y);
@@ -59,26 +59,11 @@ class Player extends Entity
 		var energySpent = H.playerDef.ecIdle * elapsed;
 		//Subtract the energy we have used.
 
-		
-		//Set the x acceleration to 0.
 		acceleration.x = 0;
-		if (I.isButtonPressed('left')) {
-			acceleration.x -= MOVEMENT_ACCEL;
-			energySpent += H.playerDef.ecMove * elapsed;
-		} 
-		if (I.isButtonPressed('right')) {
-			acceleration.x += MOVEMENT_ACCEL;
-			energySpent += H.playerDef.ecMove * elapsed;
-		} 
-		if (I.isButtonJustPressed('jump') && isTouching(FlxObject.FLOOR)) {
-			//Only run the jump code if we have the jump upgrade.
-			if (!H.gs.powerupsThis.get('jump')) {
-				velocity.y -= JUMP_STRENGTH;
-				energySpent += H.playerDef.ecIdle;
-			}
+
+		if(H.ALLOW_INPUT)
+			energySpent = getInputs(elapsed, energySpent);
 			
-		}
-		
 		//Figure out what animation state we should be playing.
 		if (!isTouching(FlxObject.FLOOR)) {
 			animation.play('idle');
@@ -105,5 +90,33 @@ class Player extends Entity
 	public function setEnergy() {
 		energyCurrent = H.playerDef.energyCurrent;
 		energyMax = H.playerDef.energyMax;
+	}
+	
+	function getInputs(elapsed:Float, energySpent:Float):Float
+	{
+		//Set the x acceleration to 0.
+		if (I.isButtonPressed('left')) {
+			acceleration.x -= MOVEMENT_ACCEL;
+			energySpent += H.playerDef.ecMove * elapsed;
+		} 
+		if (I.isButtonPressed('right')) {
+			acceleration.x += MOVEMENT_ACCEL;
+			energySpent += H.playerDef.ecMove * elapsed;
+		} 
+		if (I.isButtonJustPressed('jump') && isTouching(FlxObject.FLOOR)) {
+			//Only run the jump code if we have the jump upgrade.
+			if (H.gs.powerupsThis.get('jump')) {
+				velocity.y -= JUMP_STRENGTH;
+				energySpent += H.playerDef.ecIdle;
+			}
+		}
+		
+		if (I.isButtonPressed('powerup'))
+		energySpent -= 100 * elapsed;
+		if (I.isButtonPressed('powerdown'))
+		energySpent += 100 * elapsed;
+		
+		return energySpent;
+	
 	}
 }

@@ -115,10 +115,20 @@ Abilities can be picked up that will increase the robot's range.
 - Transition from one screen to another
 - Player movement
 - Player Graphic
-- Simple tielset
+- Simple tileset
 - Jump upgrade
 - Future robots have upgrades if brought back to base
 - Wall stick upgrade
-
+- Abort substate
 
 #WANT
+- Pretty up AbortScreen
+
+
+#To add a powerup
+-Add it to the upgrades map in the GameState
+-Create a sprite object in the powerups section under triggers
+-Create the powerup object in the map creation
+-Trigger the upgrade when the powerup is collected.
+-Change the gameState
+-Code powerup functionality
