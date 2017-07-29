@@ -7,7 +7,8 @@ import haxe.ds.StringMap;
  */
 typedef TmxRect =
 {
-	name:String,
-	r:FlxRect,
-	properties:StringMap<String>
+	var name:String;
+	var r:FlxRect;
+	@:optional var type:String;
+	var properties:StringMap<String>;
 }

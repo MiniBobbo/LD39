@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="2017.05.26" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="32" tileheight="32" nextobjectid="8">
+ <tileset firstgid="1" name="32blocks" tilewidth="32" tileheight="32" tilecount="10" columns="10">
+  <image source="../../../../../../../Pictures/Games/32blocks.png" width="320" height="32"/>
+ </tileset>
+ <layer name="collision" width="20" height="15">
+  <data encoding="csv">
+2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
+2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
+2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
+2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
+2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
+2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
+2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
+2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
+2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+2,2,2,2,2,2,2,0,0,0,0,0,0,0,2,2,2,2,2,2,
+2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2
+</data>
+ </layer>
+ <objectgroup name="Object Layer 1">
+  <object id="3" name="travel" type="1" x="2" y="323" width="7" height="89"/>
+  <object id="4" name="d" type="1" x="114" y="385" width="10" height="10"/>
+  <object id="5" name="travel" type="3" x="616" y="328" width="15" height="82"/>
+  <object id="6" name="d" type="3" x="579" y="395" width="10" height="8"/>
+  <object id="7" name="upgrade" type="jump" x="332" y="429" width="14" height="11"/>
+ </objectgroup>
+</map>

@@ -113,18 +113,20 @@ class TmxTools
 						//Parse out the rectangle.
 						var _rect = new FlxRect(Std.parseInt(object.att.x), Std.parseInt(object.att.y), Std.parseInt(object.att.width), Std.parseInt(object.att.height));
 						var _properties = new StringMap<String>();
-						if(object.has.type)
-						_properties.set('type', object.att.type);
+						//if(object.has.type)
+						//_properties.set('type', object.att.type);
 						//If we have custom properties, get them and add them to the map.
 						if (object.hasNode.properties)
 							extractCustomProperties(object.node.properties, _properties);
-
+						
 						var _r:TmxRect =
 						{
 							name:_name,
 							r:_rect,
 							properties:_properties
 						};
+						if(object.has.type)
+						_r.type = object.att.type;
 
 						_rects.push(_r);
 					case 'line':
