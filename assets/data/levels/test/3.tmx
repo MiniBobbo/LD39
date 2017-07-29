@@ -24,7 +24,7 @@
  </layer>
  <objectgroup name="Object Layer 1">
   <object id="3" name="travel" type="2" x="2" y="323" width="7" height="89"/>
-  <object id="4" name="d" type="2" x="108" y="338" width="10" height="10"/>
+  <object id="4" name="d" type="2" x="44" y="391" width="10" height="10"/>
   <object id="8" name="upgrade" type="bomb" x="555" y="366" width="10" height="3"/>
   <object id="11" name="blocks" type="break" x="168" y="393.5" width="16" height="15"/>
  </objectgroup>

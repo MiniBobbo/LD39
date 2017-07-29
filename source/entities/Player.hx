@@ -18,17 +18,17 @@ class Player extends Entity
 	var JUMP_TIME:Float = .5;
 	var MOVEMENT_ACCEL:Float = 1200;
 	var MOVEMENT_DRAG:Float = 1200;
-	var MOVEMENT_MAX_X:Float = 100;
+	var MOVEMENT_MAX_X:Float = 150;
 	var MOVEMENT_MAX_Y:Float = 500;
 	
-	
+	var currentMovementMaxX:Float;
 	
 	public var energyCurrent:Float;
 	public var energyMax:Float;
 	
 	var I = InputHelper;
 	
-	public function new(X:Float=0, Y:Float=0) 
+	public function new(X:Float=-100, Y:Float=0) 
 	{
 		super();
 		//makeGraphic(30, 30, FlxColor.BLUE);
@@ -42,7 +42,7 @@ class Player extends Entity
 		//Set the player's settings here.
 		//Gravity.
 		acceleration.y = GRAVITY;
-		maxVelocity.set(MOVEMENT_MAX_X, MOVEMENT_MAX_Y);
+		setSpeed();
 		
 		drag.x = MOVEMENT_DRAG;
 		
@@ -117,6 +117,18 @@ class Player extends Entity
 		energySpent += 100 * elapsed;
 		
 		return energySpent;
+	}
 	
+	/**
+	 * Upgrades the speed of the robots.  Really, just increases their max speed.  Doesn't affect acceleration.
+	 * @param	change  How much should the max speed change?
+	 */
+	public function setSpeed() {
+		var spd = MOVEMENT_MAX_X;
+		if (H.gs.powerupsThis.get('speed'))
+			spd += 50;
+		
+		maxVelocity.set(spd, MOVEMENT_MAX_Y);
+
 	}
 }

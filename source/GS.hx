@@ -23,9 +23,13 @@ class GS
 		powerupsAll = new StringMap<Bool>();
 		powerupsAll.set('jump', true);
 		powerupsAll.set('bomb', true);
+		powerupsAll.set('speed', false);
+		
 		powerupsThis = new StringMap<Bool>();
 		powerupsThis.set('jump', true);
 		powerupsThis.set('bomb', true);
+		powerupsThis.set('speed', false);
+		
 		levelDefs = new StringMap<LevelDef>();
 		
 		currentLevel = '1';

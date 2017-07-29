@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="2017.05.26" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="32" tileheight="32" nextobjectid="6">
+<map version="2017.05.26" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="32" tileheight="32" nextobjectid="8">
  <tileset firstgid="1" name="32blocks" tilewidth="32" tileheight="32" tilecount="10" columns="10">
   <image source="../../../../../../../Pictures/Games/32blocks.png" width="320" height="32"/>
  </tileset>
@@ -25,7 +25,9 @@
  <objectgroup name="Object Layer 1">
   <object id="1" name="spawn" x="72" y="265" width="10" height="10"/>
   <object id="2" name="travel" type="2" x="625" y="323" width="6" height="89"/>
-  <object id="3" name="d" type="2" x="582" y="382" width="18" height="18"/>
+  <object id="3" name="d" type="2" x="583" y="390" width="18" height="18"/>
   <object id="4" name="blocks" type="break" x="455" y="425" width="14" height="13"/>
+  <object id="6" name="travel" type="4" x="450" y="452" width="26" height="23"/>
+  <object id="7" name="d" type="4" x="422" y="394" width="11" height="10"/>
  </objectgroup>
 </map>

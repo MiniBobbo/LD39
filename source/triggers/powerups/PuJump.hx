@@ -1,6 +1,7 @@
 package triggers.powerups;
 
 import flixel.FlxSprite;
+import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.system.FlxAssets.FlxGraphicAsset;
 import flixel.util.FlxColor;
 
@@ -11,10 +12,14 @@ import flixel.util.FlxColor;
 class PuJump extends FlxSprite 
 {
 
-	public function new(X:Float=0, Y:Float=0) 
+	public function new(x:Float, y:Float) 
 	{
-		super(X, Y);
-		makeGraphic(32, 32, FlxColor.BLUE);
+		super(x,y);
+		var atlasFrames  = FlxAtlasFrames.fromTexturePackerJson('assets/images/atlas.png', 'assets/images/atlas.json');
+		frames = atlasFrames;
+		animation.addByPrefix('go', 'powerup', 12, true);
+		//animation.play('go');
+		angularVelocity = 180;
 	}
 	
 	

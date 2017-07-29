@@ -10,9 +10,9 @@ import flixel.util.FlxColor;
 class TrSpawn extends Trigger 
 {
 
-	public function new(?X:Float=0, ?Y:Float=0, ?SimpleGraphic:FlxGraphicAsset) 
+	public function new() 
 	{
-		super(X, Y);
+		super();
 		makeGraphic(96, 32, FlxColor.BROWN);
 		immovable = true;
 		

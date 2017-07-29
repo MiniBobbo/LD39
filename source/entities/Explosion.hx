@@ -16,7 +16,7 @@ class Explosion extends FlxSprite
 	public function new(origin:FlxPoint) 
 	{
 		super();
-		Logger.addLog('Explode', 'Trying to eplode at ' + origin,2);
+		//Logger.addLog('Explode', 'Trying to explode at ' + origin,2);
 		makeGraphic(96, 96, FlxColor.RED);
 		x = origin.x - 48;
 		y = origin.y - 48;

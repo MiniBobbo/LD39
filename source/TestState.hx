@@ -26,6 +26,7 @@ import triggers.TrSpawn;
 import triggers.Travel;
 import triggers.powerups.PuBomb;
 import triggers.powerups.PuJump;
+import triggers.powerups.PuSpeed;
 
 /**
  * ...
@@ -45,6 +46,9 @@ class TestState extends FlxState
 	var hud:FlxSpriteGroup;
 	
 	var energyBar:FlxBar;
+	
+	//Catch a weird problem where the robot immediately enters and leaves a room.
+	var timeInLevel:Float = 0;
 	
 	override public function create():Void 
 	{
@@ -67,6 +71,7 @@ class TestState extends FlxState
 		FlxG.watch.add(player, 'energyCurrent');
 		FlxG.watch.add(H.gs, 'currentLevel');
 		FlxG.watch.add(H.gs, 'previousLevel');
+		FlxG.watch.add(this, 'timeInLevel');
 		
 		
 		
@@ -95,6 +100,7 @@ class TestState extends FlxState
 	
 	override public function update(elapsed:Float):Void 
 	{
+		timeInLevel += elapsed;
 		InputHelper.updateKeys(elapsed);
 		if (!H.PAUSED) {
 			FlxG.overlap(player, triggers, hitTrigger);
@@ -130,16 +136,18 @@ class TestState extends FlxState
 			{
 				case 'spawn':
 					if (looking == 'spawn') {
-						player.x = r.r.x;
-						player.y = r.r.y;
+						var p = H.roundToNearestTile(r.r.x, r.r.y);
+						player.x = p.x;
+						player.y = p.y;
 						H.resetPlayer();
 						player.setEnergy();
 						return;
 					}
 				case 'd':
 					if (looking == r.type) {
-						player.x = r.r.x;
-						player.y = r.r.y;
+						var p = H.roundToNearestTile(r.r.x, r.r.y);
+						player.x = p.x;
+						player.y = p.y;
 						return;
 					}
 				default:
@@ -155,9 +163,10 @@ class TestState extends FlxState
 			{
 				case 'travel':
 					var t = new Travel(r.type);
-					t.makeGraphic(Std.int(r.r.width), Std.int(r.r.height), FlxColor.TRANSPARENT);
-					t.x = r.r.x;
-					t.y = r.r.y;
+					t.makeGraphic(Std.int(r.r.width), Std.int(r.r.height),FlxColor.GREEN, true);
+					var p = H.roundToNearestTile(r.r.x, r.r.y);
+					t.x = p.x;
+					t.y = p.y;
 					triggers.add(t);
 				case 'spawn':
 					var s = new TrSpawn();
@@ -197,6 +206,8 @@ class TestState extends FlxState
 		if (H.PAUSED)
 			return;
 		if (Std.is(trigger, Travel)) {
+			if (timeInLevel < 1)
+			return;
 			H.PAUSED = true;
 			H.gs.previousLevel = H.gs.currentLevel;
 			H.gs.currentLevel = cast(trigger, Travel).destination;
@@ -212,6 +223,13 @@ class TestState extends FlxState
 			trigger.kill();
 			H.gs.powerupsThis.set('bomb', true);
 		}
+		if (Std.is(trigger, PuSpeed)) {
+			var j = cast(trigger, PuSpeed);
+			trigger.kill();
+			H.gs.powerupsThis.set('speed', true);
+			player.setSpeed();
+		}
+		
 		if (Std.is(trigger, TrSpawn)) {
 			var j = cast(trigger, TrSpawn);
 			H.downloadUpgrades();
@@ -259,6 +277,16 @@ class TestState extends FlxState
 					var pu = new PuBomb(p.x, p.y);
 					triggers.add(pu);
 					Logger.addLog('Adding Powerup', 'Trying to add bomb ' + pu.toString());
+				}
+			case 'speed':
+				if (!H.gs.powerupsThis.get('speed')) {
+					//Create the jump powerup.
+					var p = H.roundToNearestTile(r.r.x,r.r.y);
+					var pu = new PuSpeed();
+					pu.x = p.x;
+					pu.y = p.y;
+					triggers.add(pu);
+					Logger.addLog('Adding Powerup', 'Trying to add speed' + pu.toString());
 				}
 			default:
 				
@@ -330,7 +358,6 @@ class TestState extends FlxState
 	 * @param	o	Object collided with.
 	 */
 	public function hitObject(p:FlxObject, o:FlxObject) {
-		Logger.addLog('Hit' , 'Hit between ' + p.toString() + ' and ' + o.toString(), 2);
 		if (Std.is(p, Explosion) && cast(o, Object).def.type == ObjectTypes.BLOCK) {
 			o.kill();
 		}
