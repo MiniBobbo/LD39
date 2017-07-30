@@ -1,6 +1,7 @@
 package;
 
 import defs.LevelDef;
+import defs.ObjectDef;
 import defs.ObjectDef.ObjectTypes;
 import entities.Block;
 import entities.Explosion;
@@ -9,12 +10,15 @@ import entities.Player;
 import entities.SpikedRobot;
 import flixel.FlxG;
 import flixel.FlxObject;
+import flixel.FlxSprite;
 import flixel.FlxState;
+import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.group.FlxGroup;
 import flixel.group.FlxSpriteGroup;
 import flixel.math.FlxPoint;
 import flixel.math.FlxRect;
 import flixel.tile.FlxTilemap;
+import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.ui.FlxBar;
 import flixel.util.FlxColor;
@@ -38,6 +42,9 @@ class TestState extends FlxState
 {
 	var map:TmxTools;
 	var collision:FlxTilemap;
+	var bg:FlxTilemap;
+	var mg:FlxTilemap;
+	var fg:FlxTilemap;
 	
 	var levelDef:LevelDef;
 	
@@ -45,6 +52,7 @@ class TestState extends FlxState
 	var triggers:FlxSpriteGroup;
 	//Objects is the generic holds for all the things the player needs to collide with
 	var objects:FlxTypedGroup<Object>;
+	var effects:FlxSpriteGroup;
 	var hud:FlxSpriteGroup;
 	
 	var energyBar:FlxBar;
@@ -60,14 +68,18 @@ class TestState extends FlxState
 		map = new TmxTools('assets/data/levels/test/' + H.gs.currentLevel + '.tmx', 'assets/data/levels/test/', 'assets/data/levels/test/');
 		collision = map.getMap('collision');
 		collision.setTileProperties(0, FlxObject.NONE);
+		bg = map.getMap('bg');
+		mg = map.getMap('mg');
+		fg = map.getMap('fg');
+		
 		
 		//Create the game objects
 		player = new Player();
 		triggers = new FlxSpriteGroup();
 		objects = new FlxTypedGroup<Object>();
+		effects = new FlxSpriteGroup();
 		hud = new FlxSpriteGroup();
 		hud.scrollFactor.set();
-		
 		
 		
 		FlxG.watch.add(player, 'energyCurrent');
@@ -87,16 +99,45 @@ class TestState extends FlxState
 
 		
 		//Add graphics.
-		add(collision);
 		add(objects);
+		//Add the maps if we have them.
+		if (bg != null)
+		add(bg);
+		if (mg != null)
+		add(mg);
 		add(player);
+		add(effects);
+		if (fg != null)
+		add(fg);
+		add(collision);
+		collision.alpha = .3;
 		add(hud);
 		add(triggers);
 		
 		//Set the camera
 		setCameraParameters();
+		if (H.gs.previousLevel == '')
+				player.alpha = 0;
+
 		//Fade the camera in.
-		FlxG.camera.fade(FlxColor.BLACK, H.FADE_TIME, true, function() {H.PAUSED = false; });
+		FlxG.camera.fade(FlxColor.BLACK, H.FADE_TIME, true, function() {
+			//If this is a spawn...
+			if (H.gs.previousLevel == '') {
+			new FlxTimer().start(.7, function(_) {
+			//After the camera fades in, wait some time, flash the spawn, show the player, and start the game.
+				H.PAUSED = false; 
+				FlxG.camera.flash(FlxColor.WHITE, .1);
+				player.alpha = 1;
+			});
+				
+			} else {
+				player.alpha = 1;
+				H.PAUSED = false; 
+				
+			}
+			
+			
+		});
 		
 	}
 	
@@ -127,7 +168,11 @@ class TestState extends FlxState
 		
 		
 	}
-	
+
+	/**
+	 * Spawn player puts the player next to the spawn point or the destination point, whichever it needs to.
+	 * @param	rects
+	 */
 	private function spawnPlayer(rects:Array<TmxRect>) {
 		var looking = H.gs.previousLevel;
 		if (looking == '')
@@ -139,8 +184,9 @@ class TestState extends FlxState
 				case 'spawn':
 					if (looking == 'spawn') {
 						var p = H.roundToNearestTile(r.r.x, r.r.y);
-						player.x = p.x;
-						player.y = p.y;
+						Logger.addLog('spawnPlayer', 'player spawned at ' + p.x,1);
+						player.x = p.x + 33;
+						player.y = p.y - 60;
 						H.resetPlayer();
 						player.setEnergy();
 						return;
@@ -149,7 +195,7 @@ class TestState extends FlxState
 					if (looking == r.type) {
 						var p = H.roundToNearestTile(r.r.x, r.r.y);
 						player.x = p.x;
-						player.y = p.y;
+						player.y = p.y-2;
 						return;
 					}
 				default:
@@ -174,8 +220,8 @@ class TestState extends FlxState
 					var s = new TrSpawn();
 					var p = H.roundToNearestTile(r.r.x, r.r.y);
 					//Spawns are 3x1, and should spawn in the ground.
-					s.x = p.x - 32;
-					s.y = p.y + 32;
+					s.x = p.x;
+					s.y = p.y;
 					triggers.add(s);
 					
 				case 'upgrade':
@@ -238,9 +284,13 @@ class TestState extends FlxState
 		}
 		
 		if (Std.is(trigger, TrSpawn)) {
-			var j = cast(trigger, TrSpawn);
-			H.downloadUpgrades();
-			FlxG.collide(a, j);
+			//If we are reentering the room, download the robot and create a new level.
+			if (H.gs.previousLevel != '') {
+				despawnRobot(cast(trigger, TrSpawn));
+			} else {
+				FlxG.collide(a, cast(trigger, TrSpawn));
+
+			}
 		}
 		
 	}
@@ -346,17 +396,23 @@ class TestState extends FlxState
 	 */
 	public function powerDownRobot() {
 		H.ALLOW_INPUT = false;
+		if(player.fsm == PlayerStates.NORMAL)
+			player.fsm = PlayerStates.POWER_DOWN;
+		else if (player.fsm == PlayerStates.SPIKED)
+			player.fsm = PlayerStates.POWER_DOWN_SPIKED;
+		//player.animation.play('powerdown');
 		new FlxTimer().start(2, function(_) {
 				FlxG.camera.fade(FlxColor.BLACK, H.FADE_TIME, false, 
 				function() {
-					var od = {
+					var od:ObjectDef = {
 						x:player.x,
 						y:player.y,
 						type:ObjectTypes.ROBOT
 					};
 					//If we are spiked, make a spiked robot instead.
-					if (player.fsm == PlayerStates.SPIKED)
+					if (player.fsm == PlayerStates.POWER_DOWN_SPIKED)
 						od.type = ObjectTypes.SPIKED;
+						od.data = player.flipX + '';
 					
 						
 					objects.add(new PoweredDown(od));
@@ -471,13 +527,43 @@ class TestState extends FlxState
 		FlxG.switchState(s);  
 		
 	}
-	
+
 	/**
-	 * Run the separate multiple times to make sure we don't get any weird overlaps.
-	 * @param	a
-	 * @param	b
+	 * Despawn the robot and download the data.  Then start another level.
 	 */
-	private function multiSeparate(a:FlxObject, b:FlxObject) {
-		
+	private function despawnRobot(spawn:TrSpawn) {
+		if (!H.ALLOW_INPUT)
+		return;
+			H.downloadUpgrades();
+			H.ALLOW_INPUT = false;
+			H.PAUSED = true;
+			//Prep the flash sprite.
+			var flash = new FlxSprite();
+			flash.frames = FlxAtlasFrames.fromTexturePackerJson('assets/images/atlas.png', 'assets/images/atlas.json');
+			flash.animation.addByPrefix('flash', 'lightbeam', 1, false);
+			flash.animation.play('flash');
+			flash.kill();
+			effects.add(flash);
+			//Put the player in position
+			FlxTween.linearMotion(player, player.x, player.y, spawn.x + 32, spawn.y - 60,.3, true, {ease:FlxEase.cubeOut, onComplete: function(_) {
+				//Wait a second, then scan and destroy the robot.
+				new FlxTimer().start(.5, function(_) {
+					FlxG.camera.flash(FlxColor.WHITE, .1);
+					flash.reset(spawn.x, spawn.y);
+					//TODO: Flash sfx here.
+					flash.velocity.y = -1000;
+					//Fade the player.
+					FlxTween.tween(player, {alpha:0}, .5);
+					FlxTween.tween(flash, {alpha:0}, .5);
+					new FlxTimer().start(2, function(_) {
+						FlxG.camera.fade(FlxColor.BLACK, H.FADE_TIME, false, function() {
+							H.resetPlayer();
+							nextLevel();
+						});
+					} );
+				
+				} );
+			} });
 	}
+
 }

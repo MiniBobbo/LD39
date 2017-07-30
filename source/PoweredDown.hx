@@ -21,8 +21,10 @@ class PoweredDown extends Object
 		super(objectDef);
 		var atlasFrames  = FlxAtlasFrames.fromTexturePackerJson('assets/images/atlas.png', 'assets/images/atlas.json');
 		frames = atlasFrames;
-		animation.addByNames('powered down', ['robot_idle_000.png'], 1, false);
+		animation.addByNames('powered down', ['robot_powerdown_124.png'], 1, false);
 		animation.play('powered down');
+		setSize(30, 20);
+		this.centerOffsets();
 
 		x = objectDef.x;
 		//TODO: Fix hack that places the powered down object higher to avoid it falling through the floor.  

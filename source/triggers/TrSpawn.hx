@@ -1,5 +1,6 @@
 package triggers;
 
+import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.system.FlxAssets.FlxGraphicAsset;
 import flixel.util.FlxColor;
 
@@ -13,8 +14,13 @@ class TrSpawn extends Trigger
 	public function new() 
 	{
 		super();
-		makeGraphic(96, 32, FlxColor.BROWN);
+		var atlasFrames  = FlxAtlasFrames.fromTexturePackerJson('assets/images/atlas.png', 'assets/images/atlas.json');
+		frames = atlasFrames;
+		animation.addByPrefix('normal', 'spawn', 12, true);
+		animation.addByPrefix('flash', 'spawn', 12, false);
+		animation.play('normal');
 		immovable = true;
+		setSize(96, 32);
 		
 	}
 	

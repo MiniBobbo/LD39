@@ -14,6 +14,6 @@ typedef ObjectDef =
 	var x:Float;
 	var y:Float;
 	var type:ObjectTypes;
-	@:optional var age:Int;
+	@:optional var data:String;
 	
 }

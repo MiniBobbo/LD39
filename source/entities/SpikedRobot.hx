@@ -1,6 +1,7 @@
 package entities;
 
 import defs.ObjectDef;
+import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.util.FlxColor;
 
 /**
@@ -13,8 +14,11 @@ class SpikedRobot extends Object
 	public function new(definition:ObjectDef) 
 	{
 		super(definition);
-		super(definition);
-		makeGraphic(32, 32, FlxColor.PURPLE);
+		var atlasFrames  = FlxAtlasFrames.fromTexturePackerJson('assets/images/atlas.png', 'assets/images/atlas.json');
+		frames = atlasFrames;
+		animation.addByPrefix('spike', 'robot_spike', 30);
+		animation.play('spike');
+
 		immovable = true;
 		def = definition;
 		x = definition.x;

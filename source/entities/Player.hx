@@ -10,6 +10,9 @@ import inputhelper.InputHelper;
 enum PlayerStates {
 	NORMAL;
 	SPIKED;
+	POWER_DOWN;
+	POWER_DOWN_SPIKED;
+	FROZEN;
 }
 
 /**
@@ -47,6 +50,10 @@ class Player extends Entity
 		lastFsm = PlayerStates.NORMAL;
 		animation.addByPrefix('walk', 'robot_walk', 61);
 		animation.addByPrefix('idle', 'robot_idle', 30);
+		animation.addByPrefix('powerdown', 'robot_powerdown_', 60, false);
+		animation.addByPrefix('spike', 'robot_spike', 30);
+		animation.addByPrefix('jumpup', 'robot_jumpup', 500, false);
+		animation.addByPrefix('jumpdown', 'robot_jumpdown', 100, false);
 		animation.play('idle');
 		setSize(30, 30);
 		centerOffsets();
@@ -82,14 +89,34 @@ class Player extends Entity
 
 		if(H.ALLOW_INPUT)
 			energySpent = getInputs(elapsed, energySpent);
+
+		switch (fsm) 
+		{
+			case PlayerStates.POWER_DOWN:
+				if (animation.name != 'powerdown')
+				animation.play('powerdown');
+			case PlayerStates.SPIKED:
+			animation.play('spike');	
 			
+			default:
 		//Figure out what animation state we should be playing.
 		if (!isTouching(FlxObject.FLOOR)) {
-			animation.play('idle');
+			if (velocity.y > 0) {
+				if (animation.name != 'jumpdown')
+				animation.play('jumpdown');
+			}
+			else if(velocity.y < 0){
+				if (animation.name != 'jumpup')
+				animation.play('jumpup');
+				
+			}
+			
 		} else if (acceleration.x != 0) {
 			animation.play('walk');
 		} else {
 			animation.play('idle');
+		}
+				
 		}
 		
 		if (acceleration.x > 0)
@@ -121,6 +148,7 @@ class Player extends Entity
 			//If we aren't on the ground and touching a wall, use the spike if we have it.
 			if (!isTouching(FlxObject.FLOOR) && isTouching(FlxObject.WALL) && H.gs.powerupsThis.get('spike')) {
 				fsm = PlayerStates.SPIKED;
+				
 			}
 		}
 		
