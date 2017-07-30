@@ -3,6 +3,7 @@ package;
 import defs.LevelDef;
 import defs.ObjectDef;
 import defs.ObjectDef.ObjectTypes;
+import defs.TriggerDef.TriggerTypes;
 import entities.Block;
 import entities.Explosion;
 import entities.Object;
@@ -22,13 +23,16 @@ import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.ui.FlxBar;
 import flixel.util.FlxColor;
+import flixel.util.FlxDestroyUtil;
 import flixel.util.FlxTimer;
 import inputhelper.InputHelper;
 import logs.Logger;
 import tmxtools.TmxRect;
 import tmxtools.TmxTools;
+import triggers.Destination;
 import triggers.TrSpawn;
 import triggers.Travel;
+import triggers.Trigger;
 import triggers.powerups.PuBomb;
 import triggers.powerups.PuJump;
 import triggers.powerups.PuSpeed;
@@ -49,7 +53,7 @@ class TestState extends FlxState
 	var levelDef:LevelDef;
 	
 	var player:Player;
-	var triggers:FlxSpriteGroup;
+	var triggers:FlxTypedGroup<Trigger>;
 	//Objects is the generic holds for all the things the player needs to collide with
 	var objects:FlxTypedGroup<Object>;
 	var effects:FlxSpriteGroup;
@@ -57,8 +61,25 @@ class TestState extends FlxState
 	
 	var energyBar:FlxBar;
 	
+	var spawnLocation:FlxPoint;
+	
 	//Catch a weird problem where the robot immediately enters and leaves a room.
 	var timeInLevel:Float = 0;
+	
+	override public function destroy():Void 
+	{
+		super.destroy();
+		//levelDef = null; 
+		//player.destroy();
+		//map = null;
+		//collision.destroy();
+		//triggers.destroy();
+		//objects.destroy();
+		//effects.destroy();
+		//hud.destroy();
+		//energyBar.destroy();
+		//spawnLocation.destroy();
+	}
 	
 	override public function create():Void 
 	{
@@ -75,7 +96,7 @@ class TestState extends FlxState
 		
 		//Create the game objects
 		player = new Player();
-		triggers = new FlxSpriteGroup();
+		triggers = new FlxTypedGroup<Trigger>();
 		objects = new FlxTypedGroup<Object>();
 		effects = new FlxSpriteGroup();
 		hud = new FlxSpriteGroup();
@@ -90,12 +111,12 @@ class TestState extends FlxState
 		
 		
 		var rects = map.getTmxRectanges();
-		spawnPlayer(rects);
-		createHUD();
-		addTriggers(rects);
+		//addTriggers(rects);
 		Logger.addLog('rects', rects.toString());
 		//Insert items in the levelDef
 		applyLevelDef();
+		spawnPlayer();
+		createHUD();
 
 		
 		//Add graphics.
@@ -173,64 +194,60 @@ class TestState extends FlxState
 	 * Spawn player puts the player next to the spawn point or the destination point, whichever it needs to.
 	 * @param	rects
 	 */
-	private function spawnPlayer(rects:Array<TmxRect>) {
-		var looking = H.gs.previousLevel;
-		if (looking == '')
-		looking = 'spawn';
-		
-		for (r in rects) {
-			switch (r.name) 
-			{
-				case 'spawn':
-					if (looking == 'spawn') {
-						var p = H.roundToNearestTile(r.r.x, r.r.y);
-						Logger.addLog('spawnPlayer', 'player spawned at ' + p.x,1);
-						player.x = p.x + 33;
-						player.y = p.y - 60;
-						H.resetPlayer();
-						player.setEnergy();
-						return;
-					}
-				case 'd':
-					if (looking == r.type) {
-						var p = H.roundToNearestTile(r.r.x, r.r.y);
-						player.x = p.x;
-						player.y = p.y-2;
-						return;
-					}
-				default:
+	private function spawnPlayer() {
+		if (H.gs.previousLevel == '') {
+			//Place the player at the spawn point definition, not the actual object.  They should be the same, but weird things are happening anyway.
+			for (o in levelDef.objects){
+				if (o.type == ObjectTypes.SPAWN) {
+					var p = H.roundToNearestTile(o.x, o.y);
+					player.x = 65;
+					player.y = 256;
+					H.resetPlayer();
+					player.setEnergy();
+					return;
+				}
 			}
 		}
-		Logger.addLog('Spawn Player', 'Unable to add player to the level.  Looking for destination ' + looking, 1);
+		
+		//var looking = H.gs.previousLevel;
+	//
+		for (t in triggers) {
+			if (t.def.type == TriggerTypes.DESTINATION && t.def.data == H.gs.previousLevel) {
+				player.x = t.x;
+				player.y = t.y;
+				return;
+			}
+		}
+		//Logger.addLog('Spawn Player', 'Unable to add player to the level.  Looking for destination ' + looking, 1);
 		
 	}
 	
-	private function addTriggers(rects:Array<TmxRect>) {
-		for (r in rects) {
-			switch (r.name) 
-			{
-				case 'travel':
-					var t = new Travel(r.type);
-					t.makeGraphic(Std.int(r.r.width), Std.int(r.r.height),FlxColor.TRANSPARENT, true);
-					var p = H.roundToNearestTile(r.r.x, r.r.y);
-					t.x = p.x;
-					t.y = p.y;
-					triggers.add(t);
-				case 'spawn':
-					var s = new TrSpawn();
-					var p = H.roundToNearestTile(r.r.x, r.r.y);
-					//Spawns are 3x1, and should spawn in the ground.
-					s.x = p.x;
-					s.y = p.y;
-					triggers.add(s);
-					
-				case 'upgrade':
-					createUpgrade(r);
-				default:
-					
-			}
-		}
-	}
+	//private function addTriggers(rects:Array<TmxRect>) {
+		//for (r in rects) {
+			//switch (r.name) 
+			//{
+				//case 'travel':
+					//var t = new Travel(r.type);
+					//t.makeGraphic(Std.int(r.r.width), Std.int(r.r.height),FlxColor.TRANSPARENT, true);
+					//var p = H.roundToNearestTile(r.r.x, r.r.y);
+					//t.x = p.x;
+					//t.y = p.y;
+					//triggers.add(t);
+				//case 'spawn':
+					//var s = new TrSpawn();
+					//var p = H.roundToNearestTile(r.r.x, r.r.y);
+					////Spawns are 3x1, and should spawn in the ground.
+					//s.x = p.x;
+					//s.y = p.y;
+					//triggers.add(s);
+					//
+				//case 'upgrade':
+					//createUpgrade(r);
+				//default:
+					//
+			//}
+		//}
+	//}
 	
 	/**
 	 * Creates the HUD objects and adds them to the hud group
@@ -282,17 +299,6 @@ class TestState extends FlxState
 			H.gs.powerupsThis.set('spike', true);
 			player.setSpeed();
 		}
-		
-		if (Std.is(trigger, TrSpawn)) {
-			//If we are reentering the room, download the robot and create a new level.
-			if (H.gs.previousLevel != '') {
-				despawnRobot(cast(trigger, TrSpawn));
-			} else {
-				FlxG.collide(a, cast(trigger, TrSpawn));
-
-			}
-		}
-		
 	}
 	
 	
@@ -316,49 +322,49 @@ class TestState extends FlxState
 	 * Creates an upgrade on the map if one doesn't already exist.
 	 * @param	r	The rect that holds the upgrade data.  Check the type
 	 */
-	private function createUpgrade(r:TmxRect) {
-		switch (r.type) 
-		{
-			case 'jump':
-				if (!H.gs.powerupsThis.get('jump')) {
-					//Create the jump powerup.
-					var p = H.roundToNearestTile(r.r.x,r.r.y);
-					var jump = new PuJump(p.x, p.y);
-					triggers.add(jump);
-					Logger.addLog('Adding Powerup', 'Trying to add jump ' + jump.toString());
-				}
-			case 'bomb':
-				if (!H.gs.powerupsThis.get('bomb')) {
-					//Create the jump powerup.
-					var p = H.roundToNearestTile(r.r.x,r.r.y);
-					var pu = new PuBomb(p.x, p.y);
-					triggers.add(pu);
-					Logger.addLog('Adding Powerup', 'Trying to add bomb ' + pu.toString());
-				}
-			case 'speed':
-				if (!H.gs.powerupsThis.get('speed')) {
-					//Create the jump powerup.
-					var p = H.roundToNearestTile(r.r.x,r.r.y);
-					var pu = new PuSpeed();
-					pu.x = p.x;
-					pu.y = p.y;
-					triggers.add(pu);
-					Logger.addLog('Adding Powerup', 'Trying to add speed' + pu.toString());
-				}
-			case 'spike':
-				if (!H.gs.powerupsThis.get('spike')) {
-					//Create the jump powerup.
-					var p = H.roundToNearestTile(r.r.x,r.r.y);
-					var pu = new PuSpike();
-					pu.x = p.x;
-					pu.y = p.y;
-					triggers.add(pu);
-					Logger.addLog('Adding Powerup', 'Trying to add spike' + pu.toString());
-				}
-			default:
-				
-		}
-	}
+	//private function createUpgrade(r:TmxRect) {
+		//switch (r.type) 
+		//{
+			//case 'jump':
+				//if (!H.gs.powerupsThis.get('jump')) {
+					////Create the jump powerup.
+					//var p = H.roundToNearestTile(r.r.x,r.r.y);
+					//var jump = new PuJump(p.x, p.y);
+					//triggers.add(jump);
+					//Logger.addLog('Adding Powerup', 'Trying to add jump ' + jump.toString());
+				//}
+			//case 'bomb':
+				//if (!H.gs.powerupsThis.get('bomb')) {
+					////Create the jump powerup.
+					//var p = H.roundToNearestTile(r.r.x,r.r.y);
+					//var pu = new PuBomb(p.x, p.y);
+					//triggers.add(pu);
+					//Logger.addLog('Adding Powerup', 'Trying to add bomb ' + pu.toString());
+				//}
+			//case 'speed':
+				//if (!H.gs.powerupsThis.get('speed')) {
+					////Create the jump powerup.
+					//var p = H.roundToNearestTile(r.r.x,r.r.y);
+					//var pu = new PuSpeed();
+					//pu.x = p.x;
+					//pu.y = p.y;
+					//triggers.add(pu);
+					//Logger.addLog('Adding Powerup', 'Trying to add speed' + pu.toString());
+				//}
+			//case 'spike':
+				//if (!H.gs.powerupsThis.get('spike')) {
+					////Create the jump powerup.
+					//var p = H.roundToNearestTile(r.r.x,r.r.y);
+					//var pu = new PuSpike();
+					//pu.x = p.x;
+					//pu.y = p.y;
+					//triggers.add(pu);
+					//Logger.addLog('Adding Powerup', 'Trying to add spike' + pu.toString());
+				//}
+			//default:
+				//
+		//}
+	//}
 	
 	/**
 	 * Send a signal to this stage.  Normally used by the substate.
@@ -368,6 +374,7 @@ class TestState extends FlxState
 		switch (signal) 
 		{
 			case 'power down':
+				Logger.addLog('power down', 'Powering down', 1);
 				powerDownRobot();
 			case 'explode':
 				H.ALLOW_INPUT = false;
@@ -416,14 +423,8 @@ class TestState extends FlxState
 					
 						
 					objects.add(new PoweredDown(od));
+					FlxDestroyUtil.destroy(player);
 					H.resetPlayer();
-					//var ld = H.gs.getLevelDef(H.gs.currentLevel);
-					//ld.poweredDown.push({
-						//x:player.x,
-						//y:player.y,
-						//state:PoweredDownStates.NORMAL,
-						//flipX:player.flipX
-					//});
 					nextLevel();
 					
 				});
@@ -436,6 +437,16 @@ class TestState extends FlxState
 	 * @param	o	Object collided with.
 	 */
 	public function hitObject(p:FlxObject, o:FlxObject) {
+		if (Std.is(o, TrSpawn)) {
+			//If we are reentering the room, download the robot and create a new level.
+			if (H.gs.previousLevel != '') {
+				despawnRobot(cast(o, TrSpawn));
+			} else {
+				FlxG.collide(p, o);
+
+			}
+		}
+		
 		if (Std.is(p, Explosion) && cast(o, Object).def.type == ObjectTypes.BLOCK) {
 			o.kill();
 		}
@@ -454,19 +465,58 @@ class TestState extends FlxState
 			levelDef = H.gs.getLevelDef(H.gs.currentLevel);
 			//Create any objects.
 			for (o in map.getTmxRectanges()) {
-				if (o.name == 'blocks') {
-					var p = H.roundToNearestTile(o.r.x, o.r.y); 
-					levelDef.objects.push( {
+				switch (o.name) 
+				{
+					case 'appear':
+						spawnLocation = new FlxPoint(o.r.x,o.r.y);
+					case 'spawn':
+						var p = H.roundToNearestTile(o.r.x, o.r.y); 
+						levelDef.objects.push( {
 						x:p.x,
 						y:p.y,
-						type:ObjectTypes.BLOCK
-					});
+						type:ObjectTypes.SPAWN });
+						
+					case 'travel':
+						var p = H.roundToNearestTile(o.r.x, o.r.y); 
+						levelDef.triggers.push( {
+						x:p.x,
+						y:p.y,
+						width:o.r.width,
+						height:o.r.height,
+						data:o.type,
+						type:TriggerTypes.TRAVEL });
+					case 'd':
+						var p = H.roundToNearestTile(o.r.x, o.r.y); 
+						levelDef.triggers.push( {
+						x:p.x,
+						y:p.y,
+						width:o.r.width,
+						height:o.r.height,
+						data:o.type,
+						type:TriggerTypes.DESTINATION });
+					case 'u':
+						var p = H.roundToNearestTile(o.r.x, o.r.y); 
+						levelDef.triggers.push( {
+						x:p.x,
+						y:p.y,
+						width:o.r.width,
+						height:o.r.height,
+						data:o.type,
+						type:TriggerTypes.UPGRADE});
+						
+					case 'blocks':
+						var p = H.roundToNearestTile(o.r.x, o.r.y); 
+						levelDef.objects.push( {
+						x:p.x,
+						y:p.y,
+						type:ObjectTypes.BLOCK});
+					
+					default:
+						
 				}
 			}
 		} else {
-			Logger.addLog('Creating level def', 'Reentering level ' + H.gs.currentLevel, 3);
 			levelDef = H.gs.getLevelDef(H.gs.currentLevel);
-			
 		}
 			//An array of robot objects.  Restrict the number of robots on the screen to 3, plus the active one.
 			var robotObjs:Array<Object> = [];
@@ -476,7 +526,8 @@ class TestState extends FlxState
 			
 			switch (obj.type) 
 			{
-				
+				case ObjectTypes.SPAWN:
+					objects.add(new TrSpawn(obj));
 				case ObjectTypes.BLOCK:
 					var b = new Block(obj);
 					objects.add(b);
@@ -500,6 +551,21 @@ class TestState extends FlxState
 		for(r in robotObjs)
 		objects.add(r);
 
+		//Create the triggers from the definitions
+		for (t in levelDef.triggers) {
+			switch (t.type) 
+			{
+				case TriggerTypes.TRAVEL:
+					triggers.add(new Travel(t));
+				case TriggerTypes.DESTINATION:
+					triggers.add(new Destination(t));
+				case TriggerTypes.UPGRADE:
+					
+					
+				default:
+					
+			}
+		}
 	}
 	
 	/**
@@ -509,11 +575,15 @@ class TestState extends FlxState
 	private function updateLevelDef() {
 		//clear all the objects.
 		levelDef.objects = [];
+		levelDef.triggers = [];
 		for (o in objects) {
 			//Loop through the objects and have them update their definitions.
 			if (o.alive) {
 				levelDef.objects.push(o.updateDefinition());
 			}
+		}
+		for (t in triggers) {
+			levelDef.triggers.push(t.def);
 		}
 	}
 	

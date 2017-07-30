@@ -1,19 +1,21 @@
 package triggers.powerups;
 
+import defs.TriggerDef;
 import flixel.FlxSprite;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.system.FlxAssets.FlxGraphicAsset;
+import triggers.Trigger;
 
 /**
  * ...
  * @author 
  */
-class PuSpeed extends FlxSprite 
+class PuSpeed extends Trigger 
 {
 
-	public function new() 
+	public function new(def:TriggerDef) 
 	{
-		super();
+		super(def);
 		var atlasFrames  = FlxAtlasFrames.fromTexturePackerJson('assets/images/atlas.png', 'assets/images/atlas.json');
 		frames = atlasFrames;
 		animation.addByPrefix('go', 'powerup', 12, true);

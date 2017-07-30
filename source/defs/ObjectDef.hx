@@ -4,7 +4,10 @@ enum ObjectTypes {
 	BLOCK;
 	ROBOT;
 	SPIKED;
+	SPAWN;
 }
+
+
 
 /**
  * @author 

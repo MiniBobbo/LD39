@@ -8,4 +8,6 @@ import flixel.FlxSprite;
 typedef LevelDef =
 {
 	var objects:Array<ObjectDef>;
+	var triggers:Array<TriggerDef>;
+	
 }

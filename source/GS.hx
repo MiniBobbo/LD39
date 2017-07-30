@@ -61,7 +61,8 @@ class GS
 	public function getLevelDef(level:String):LevelDef {
 		if (!levelDefs.exists(level)) {
 			levelDefs.set(level, {
-				objects:[]
+				objects:[],
+				triggers:[]
 			});
 			Logger.addLog('getLevelDef', 'Created level def ' + level, 2);
 		}
