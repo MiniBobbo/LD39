@@ -6,6 +6,7 @@ import entities.Block;
 import entities.Explosion;
 import entities.Object;
 import entities.Player;
+import entities.SpikedRobot;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxState;
@@ -27,6 +28,7 @@ import triggers.Travel;
 import triggers.powerups.PuBomb;
 import triggers.powerups.PuJump;
 import triggers.powerups.PuSpeed;
+import triggers.powerups.PuSpike;
 
 /**
  * ...
@@ -163,7 +165,7 @@ class TestState extends FlxState
 			{
 				case 'travel':
 					var t = new Travel(r.type);
-					t.makeGraphic(Std.int(r.r.width), Std.int(r.r.height),FlxColor.GREEN, true);
+					t.makeGraphic(Std.int(r.r.width), Std.int(r.r.height),FlxColor.TRANSPARENT, true);
 					var p = H.roundToNearestTile(r.r.x, r.r.y);
 					t.x = p.x;
 					t.y = p.y;
@@ -229,6 +231,11 @@ class TestState extends FlxState
 			H.gs.powerupsThis.set('speed', true);
 			player.setSpeed();
 		}
+		if (Std.is(trigger, PuSpike)) {
+			trigger.kill();
+			H.gs.powerupsThis.set('spike', true);
+			player.setSpeed();
+		}
 		
 		if (Std.is(trigger, TrSpawn)) {
 			var j = cast(trigger, TrSpawn);
@@ -288,6 +295,16 @@ class TestState extends FlxState
 					triggers.add(pu);
 					Logger.addLog('Adding Powerup', 'Trying to add speed' + pu.toString());
 				}
+			case 'spike':
+				if (!H.gs.powerupsThis.get('spike')) {
+					//Create the jump powerup.
+					var p = H.roundToNearestTile(r.r.x,r.r.y);
+					var pu = new PuSpike();
+					pu.x = p.x;
+					pu.y = p.y;
+					triggers.add(pu);
+					Logger.addLog('Adding Powerup', 'Trying to add spike' + pu.toString());
+				}
 			default:
 				
 		}
@@ -337,6 +354,11 @@ class TestState extends FlxState
 						y:player.y,
 						type:ObjectTypes.ROBOT
 					};
+					//If we are spiked, make a spiked robot instead.
+					if (player.fsm == PlayerStates.SPIKED)
+						od.type = ObjectTypes.SPIKED;
+					
+						
 					objects.add(new PoweredDown(od));
 					H.resetPlayer();
 					//var ld = H.gs.getLevelDef(H.gs.currentLevel);
@@ -362,7 +384,7 @@ class TestState extends FlxState
 			o.kill();
 		}
 		
-		if (Std.is(o, PoweredDown) || Std.is(o, Block)) {
+		if (Std.is(o, PoweredDown) || Std.is(o, Block) || Std.is(o, SpikedRobot)) {
 			FlxG.collide(p,o);
 		}
 		
@@ -390,21 +412,38 @@ class TestState extends FlxState
 			levelDef = H.gs.getLevelDef(H.gs.currentLevel);
 			
 		}
+			//An array of robot objects.  Restrict the number of robots on the screen to 3, plus the active one.
+			var robotObjs:Array<Object> = [];
 		
 		//Create the objects from the Object Definitions.
 		for (obj in levelDef.objects) {
+			
 			switch (obj.type) 
 			{
+				
 				case ObjectTypes.BLOCK:
 					var b = new Block(obj);
 					objects.add(b);
 				case ObjectTypes.ROBOT:
 					var r = new PoweredDown(obj);
-					objects.add(r);
+					robotObjs.push(r);
+				case ObjectTypes.SPIKED:
+					var s = new SpikedRobot(obj);
+					robotObjs.push(s);
 				default:
-					
 			}
+			FlxG.watch.add(robotObjs, 'length');
+			
 		}
+		//Check how many are in the array.  If there are more than 3, get rid of the first until there are only three left.
+		while (robotObjs.length > 3) {
+			robotObjs.shift();
+		}
+			
+		//Add the remaining robots to the game.
+		for(r in robotObjs)
+		objects.add(r);
+
 	}
 	
 	/**

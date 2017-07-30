@@ -24,11 +24,13 @@ class GS
 		powerupsAll.set('jump', true);
 		powerupsAll.set('bomb', true);
 		powerupsAll.set('speed', false);
+		powerupsAll.set('spike', true);
 		
 		powerupsThis = new StringMap<Bool>();
 		powerupsThis.set('jump', true);
 		powerupsThis.set('bomb', true);
 		powerupsThis.set('speed', false);
+		powerupsThis.set('spike', true);
 		
 		levelDefs = new StringMap<LevelDef>();
 		

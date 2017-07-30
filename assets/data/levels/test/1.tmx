@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="2017.05.26" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="32" tileheight="32" nextobjectid="8">
+<map version="2017.05.26" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="32" tileheight="32" nextobjectid="10">
  <tileset firstgid="1" name="32blocks" tilewidth="32" tileheight="32" tilecount="10" columns="10">
   <image source="../../../../../../../Pictures/Games/32blocks.png" width="320" height="32"/>
  </tileset>
  <layer name="collision" width="20" height="15">
   <data encoding="csv">
 2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
-2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
-2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
 2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
 2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
 2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
@@ -29,5 +29,7 @@
   <object id="4" name="blocks" type="break" x="455" y="425" width="14" height="13"/>
   <object id="6" name="travel" type="4" x="450" y="452" width="26" height="23"/>
   <object id="7" name="d" type="4" x="422" y="394" width="11" height="10"/>
+  <object id="8" name="travel" type="6" x="5" y="35" width="20" height="84"/>
+  <object id="9" name="d" type="6" x="42" y="101" width="15" height="15"/>
  </objectgroup>
 </map>

@@ -3,6 +3,7 @@ package defs;
 enum ObjectTypes {
 	BLOCK;
 	ROBOT;
+	SPIKED;
 }
 
 /**
@@ -13,5 +14,6 @@ typedef ObjectDef =
 	var x:Float;
 	var y:Float;
 	var type:ObjectTypes;
+	@:optional var age:Int;
 	
 }
