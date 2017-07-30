@@ -1,6 +1,8 @@
 package;
+import defs.CutsceneDef;
 import defs.PlayerDef;
 import flixel.math.FlxPoint;
+import haxe.ds.StringMap;
 
 /**
  * Game Helper
@@ -13,18 +15,25 @@ class H
 	public static var gs:GS;
 	public static var playerDef:PlayerDef;
 	
+	public static var TYPETEXT_DELAY:Float = 0.02;
+	
+	public static var MAP_LOCATION:String = 'assets/data/levels/';
+	
 	static var BASE_ENERGY:Float = 30;
 	static var EC_MOVE_BASE:Float = 1;
 	static var EC_IDLE_BASE:Float = .1;
 	static var EC_JUMP_BASE:Float = 2;
 	
 	public static var FADE_TIME:Float = .5;
+	public static var TEXT_TIME:Float = .5;
 	
 	public static var PAUSED:Bool;
 	public static var ALLOW_INPUT:Bool;
 	
 	public static var GRAVITY:Float = 300;
 	public static var MOVEMENT_DRAG:Float = 1200;
+	
+	public static var cutscenes:StringMap<CutsceneDef>;
 	
 
 	/**
@@ -49,6 +58,8 @@ class H
 			ecJump:EC_JUMP_BASE,
 			ecIdle:EC_IDLE_BASE
 		};
+		cutscenes = new StringMap<CutsceneDef>();
+		createCutscenes();
 		//Start the game paused because the screen will fade in and unpause everything.
 		PAUSED = true;
 		ALLOW_INPUT = true;
@@ -73,6 +84,14 @@ class H
 			//Set the powerupAll value to the value contained in the powerupThis value;
 			gs.powerupsAll.set(k, gs.powerupsThis.get(k));
 		}
+	}
+	/**
+	 * Creates all the initial cutsene definitions
+	 */
+	public static function createCutscenes() {
+		cutscenes.set('welcome', {
+			messages:['EXEC: SELF_REPAIR.EXE\nATTEMPT 14437\n\n...................................\n...................................','REPAIR.EXE FAILED\n\nRUNNING DIAGNOSTICS','...'
+		]});
 	}
 	
 	

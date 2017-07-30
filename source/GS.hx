@@ -21,16 +21,16 @@ class GS
 	{
 		//Add the powerups.
 		powerupsAll = new StringMap<Bool>();
-		powerupsAll.set('jump', true);
-		powerupsAll.set('bomb', true);
+		powerupsAll.set('jump', false);
+		powerupsAll.set('bomb', false);
 		powerupsAll.set('speed', false);
-		powerupsAll.set('spike', true);
+		powerupsAll.set('spike', false);
 		
 		powerupsThis = new StringMap<Bool>();
-		powerupsThis.set('jump', true);
-		powerupsThis.set('bomb', true);
+		powerupsThis.set('jump', false);
+		powerupsThis.set('bomb', false);
 		powerupsThis.set('speed', false);
-		powerupsThis.set('spike', true);
+		powerupsThis.set('spike', false);
 		
 		levelDefs = new StringMap<LevelDef>();
 		
@@ -64,7 +64,7 @@ class GS
 				objects:[],
 				triggers:[]
 			});
-			Logger.addLog('getLevelDef', 'Created level def ' + level, 2);
+			Logger.addLog('getLevelDef', 'Created level def ' + level);
 		}
 		return levelDefs.get(level);
 	}
@@ -77,7 +77,7 @@ class GS
 	 */
 	public function setLevelDef(level:String, levelDef:LevelDef) {
 			levelDefs.set(level, levelDef);
-			Logger.addLog('setLevelDef', 'Setting level def for level ' + level, 2);
+			Logger.addLog('setLevelDef', 'Setting level def for level ' + level);
 	}
 	
 	/**

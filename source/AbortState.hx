@@ -60,8 +60,6 @@ class AbortState extends FlxSubState
 	private function powerDown() {
 		var ps = cast(_parentState, TestState);
 		ps.signalMe('power down');
-		H.PAUSED = false;
-		
 		_parentState.closeSubState();
 	}
 	private function explode() {

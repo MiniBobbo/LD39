@@ -4,6 +4,8 @@ enum TriggerTypes {
 	UPGRADE;
 	TRAVEL;
 	DESTINATION;
+	TEXT;
+	CUTSCENE;
 }
 
 /**

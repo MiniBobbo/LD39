@@ -18,6 +18,7 @@ import flixel.group.FlxGroup;
 import flixel.group.FlxSpriteGroup;
 import flixel.math.FlxPoint;
 import flixel.math.FlxRect;
+import flixel.text.FlxText;
 import flixel.tile.FlxTilemap;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
@@ -30,7 +31,9 @@ import logs.Logger;
 import tmxtools.TmxRect;
 import tmxtools.TmxTools;
 import triggers.Destination;
+import triggers.TrCutscene;
 import triggers.TrSpawn;
+import triggers.TrText;
 import triggers.Travel;
 import triggers.Trigger;
 import triggers.powerups.PuBomb;
@@ -58,6 +61,8 @@ class TestState extends FlxState
 	var objects:FlxTypedGroup<Object>;
 	var effects:FlxSpriteGroup;
 	var hud:FlxSpriteGroup;
+	var helpText:FlxText;
+	var helpTextTimer:Float;
 	
 	var energyBar:FlxBar;
 	
@@ -85,13 +90,24 @@ class TestState extends FlxState
 	{
 		super.create();
 		H.ALLOW_INPUT = true;
+		H.PAUSED = true;
 		//Create the map for the level we are on.
-		map = new TmxTools('assets/data/levels/test/' + H.gs.currentLevel + '.tmx', 'assets/data/levels/test/', 'assets/data/levels/test/');
+		try{
+			map = new TmxTools(H.MAP_LOCATION + H.gs.currentLevel + '.tmx', H.MAP_LOCATION, H.MAP_LOCATION);
+			collision = map.getMap('collision');
+			collision.setTileProperties(0, FlxObject.NONE);
+			bg = map.getMap('bg');
+			
+		} catch (err:Dynamic)
+		{
+			FlxG.log.add(err);
+		}
+		map = new TmxTools(H.MAP_LOCATION + H.gs.currentLevel + '.tmx', H.MAP_LOCATION, H.MAP_LOCATION);
 		collision = map.getMap('collision');
 		collision.setTileProperties(0, FlxObject.NONE);
 		bg = map.getMap('bg');
-		mg = map.getMap('mg');
-		fg = map.getMap('fg');
+		//mg = map.getMap('mg');
+		//fg = map.getMap('fg');
 		
 		
 		//Create the game objects
@@ -117,19 +133,20 @@ class TestState extends FlxState
 		applyLevelDef();
 		spawnPlayer();
 		createHUD();
-
+		
+		
 		
 		//Add graphics.
 		add(objects);
 		//Add the maps if we have them.
 		if (bg != null)
 		add(bg);
-		if (mg != null)
-		add(mg);
+		//if (mg != null)
+		//add(mg);
 		add(player);
 		add(effects);
-		if (fg != null)
-		add(fg);
+		//if (fg != null)
+		//add(fg);
 		add(collision);
 		collision.alpha = .3;
 		add(hud);
@@ -167,6 +184,7 @@ class TestState extends FlxState
 		timeInLevel += elapsed;
 		InputHelper.updateKeys(elapsed);
 		if (!H.PAUSED) {
+			helpText.visible = false;
 			FlxG.overlap(player, triggers, hitTrigger);
 			FlxG.overlap(player, objects, hitObject);
 			
@@ -222,32 +240,6 @@ class TestState extends FlxState
 		
 	}
 	
-	//private function addTriggers(rects:Array<TmxRect>) {
-		//for (r in rects) {
-			//switch (r.name) 
-			//{
-				//case 'travel':
-					//var t = new Travel(r.type);
-					//t.makeGraphic(Std.int(r.r.width), Std.int(r.r.height),FlxColor.TRANSPARENT, true);
-					//var p = H.roundToNearestTile(r.r.x, r.r.y);
-					//t.x = p.x;
-					//t.y = p.y;
-					//triggers.add(t);
-				//case 'spawn':
-					//var s = new TrSpawn();
-					//var p = H.roundToNearestTile(r.r.x, r.r.y);
-					////Spawns are 3x1, and should spawn in the ground.
-					//s.x = p.x;
-					//s.y = p.y;
-					//triggers.add(s);
-					//
-				//case 'upgrade':
-					//createUpgrade(r);
-				//default:
-					//
-			//}
-		//}
-	//}
 	
 	/**
 	 * Creates the HUD objects and adds them to the hud group
@@ -258,6 +250,12 @@ class TestState extends FlxState
 		energyBar.setRange(0, H.playerDef.energyMax);
 		energyBar.numDivisions = 500;
 		hud.add(energyBar);
+		
+		helpText = new FlxText(0, 0, 600, '');
+		helpText.setFormat(null, 16, FlxColor.WHITE, FlxTextAlign.CENTER);
+		helpText.screenCenter();
+		helpText.y -= 200;
+		hud.add(helpText);
 	}
 	
 	/**
@@ -266,11 +264,10 @@ class TestState extends FlxState
 	 * @param	trigger	The trigger that was hit.
 	 */
 	private function hitTrigger(a:Dynamic, trigger:Dynamic) {
-		
 		//If we are paused, don't hit triggers.
 		if (H.PAUSED)
 			return;
-		if (Std.is(trigger, Travel)) {
+		else if (Std.is(trigger, Travel)) {
 			if (timeInLevel < 1)
 			return;
 			H.PAUSED = true;
@@ -278,26 +275,34 @@ class TestState extends FlxState
 			H.gs.currentLevel = cast(trigger, Travel).destination;
 			FlxG.camera.fade(FlxColor.BLACK, H.FADE_TIME, false, function() { nextLevel(); });
 		}
-		if (Std.is(trigger, PuJump)) {
+		else if (Std.is(trigger, PuJump)) {
 			var j = cast(trigger, PuJump);
 			trigger.kill();
 			H.gs.powerupsThis.set('jump', true);
 		}
-		if (Std.is(trigger, PuBomb)) {
+		else if (Std.is(trigger, PuBomb)) {
 			var j = cast(trigger, PuBomb);
 			trigger.kill();
 			H.gs.powerupsThis.set('bomb', true);
 		}
-		if (Std.is(trigger, PuSpeed)) {
+		else if (Std.is(trigger, PuSpeed)) {
 			var j = cast(trigger, PuSpeed);
 			trigger.kill();
 			H.gs.powerupsThis.set('speed', true);
 			player.setSpeed();
 		}
-		if (Std.is(trigger, PuSpike)) {
+		else if (Std.is(trigger, PuSpike)) {
 			trigger.kill();
 			H.gs.powerupsThis.set('spike', true);
 			player.setSpeed();
+		} else if (Std.is(trigger, TrText )) {
+			helpText.text = cast(trigger, TrText).def.data;
+			helpText.visible = true;
+		} else if (Std.is(trigger, TrCutscene)) {
+			var c = cast(trigger, TrCutscene);
+			//Logger.addLog('Hit Cutscene ' + c.name, H.cutscenes.get(c.name).messages.toString(), 1);
+			c.kill();
+			openSubState(new CutsceneSubState(c.name));
 		}
 	}
 	
@@ -374,7 +379,6 @@ class TestState extends FlxState
 		switch (signal) 
 		{
 			case 'power down':
-				Logger.addLog('power down', 'Powering down', 1);
 				powerDownRobot();
 			case 'explode':
 				H.ALLOW_INPUT = false;
@@ -391,7 +395,10 @@ class TestState extends FlxState
 				);
 			case 'disentigrate':
 				H.ALLOW_INPUT = false;
-				
+					new FlxTimer().start(1.2, function(_) {
+					H.resetPlayer();
+					nextLevel();
+				});
 				
 			default:
 				
@@ -403,32 +410,36 @@ class TestState extends FlxState
 	 */
 	public function powerDownRobot() {
 		H.ALLOW_INPUT = false;
+		H.PAUSED = false;
 		if(player.fsm == PlayerStates.NORMAL)
 			player.fsm = PlayerStates.POWER_DOWN;
 		else if (player.fsm == PlayerStates.SPIKED)
 			player.fsm = PlayerStates.POWER_DOWN_SPIKED;
-		//player.animation.play('powerdown');
+			
+			//Create the new def for the powered down robot.
+			var od:ObjectDef = {
+				x:player.x,
+				y:player.y,
+				type:ObjectTypes.ROBOT
+			};
+			//If we are spiked, make a spiked robot instead.
+			if (player.fsm == PlayerStates.POWER_DOWN_SPIKED) {
+				od.type = ObjectTypes.SPIKED;
+				od.data = player.flipX + '';
+			}
+			var pd = new PoweredDown(od);
+			pd.visible = false;
+			objects.add(pd);
 		new FlxTimer().start(2, function(_) {
-				FlxG.camera.fade(FlxColor.BLACK, H.FADE_TIME, false, 
-				function() {
-					var od:ObjectDef = {
-						x:player.x,
-						y:player.y,
-						type:ObjectTypes.ROBOT
-					};
-					//If we are spiked, make a spiked robot instead.
-					if (player.fsm == PlayerStates.POWER_DOWN_SPIKED)
-						od.type = ObjectTypes.SPIKED;
-						od.data = player.flipX + '';
-					
-						
-					objects.add(new PoweredDown(od));
-					FlxDestroyUtil.destroy(player);
-					H.resetPlayer();
-					nextLevel();
-					
-				});
-		});
+							var p = FlxPoint.weak(player.x, player.y);
+							//player.x = -1000;
+							pd.x = p.x;
+							pd.y = p.y;
+							H.resetPlayer();
+							nextLevel();
+								
+		} );
+			
 	}
 	
 	/**
@@ -467,6 +478,25 @@ class TestState extends FlxState
 			for (o in map.getTmxRectanges()) {
 				switch (o.name) 
 				{
+					case 'cutscene':
+						levelDef.triggers.push({ 
+							x:o.r.x,
+							y:o.r.y,
+							width:o.r.width,
+							height:o.r.height,
+							type:TriggerTypes.CUTSCENE,
+							data:o.type
+							
+						});
+					case 'text':
+						levelDef.triggers.push({
+							x:o.r.x,
+							y:o.r.y,
+							width:o.r.width,
+							height:o.r.height,
+							type:TriggerTypes.TEXT,
+							data:o.type
+						});
 					case 'appear':
 						spawnLocation = new FlxPoint(o.r.x,o.r.y);
 					case 'spawn':
@@ -555,8 +585,12 @@ class TestState extends FlxState
 		for (t in levelDef.triggers) {
 			switch (t.type) 
 			{
+				case TriggerTypes.TEXT:
+					triggers.add(new TrText(t));
 				case TriggerTypes.TRAVEL:
 					triggers.add(new Travel(t));
+				case TriggerTypes.CUTSCENE:
+					triggers.add(new TrCutscene(t));
 				case TriggerTypes.DESTINATION:
 					triggers.add(new Destination(t));
 				case TriggerTypes.UPGRADE:
@@ -583,6 +617,7 @@ class TestState extends FlxState
 			}
 		}
 		for (t in triggers) {
+			if (t.alive)
 			levelDef.triggers.push(t.def);
 		}
 	}
