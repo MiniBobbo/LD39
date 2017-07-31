@@ -1,5 +1,6 @@
 package entities;
 
+import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.math.FlxPoint;
 import flixel.system.FlxAssets.FlxGraphicAsset;
@@ -18,6 +19,7 @@ class Explosion extends FlxSprite
 		super();
 		//Logger.addLog('Explode', 'Trying to explode at ' + origin,2);
 		makeGraphic(96, 96, FlxColor.RED);
+		FlxG.sound.play('assets/sounds/explode.wav');
 		x = origin.x - 48;
 		y = origin.y - 48;
 		

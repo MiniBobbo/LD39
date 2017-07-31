@@ -17,8 +17,7 @@ class Trigger extends FlxSprite
 	{
 		super();
 		this.def = def;
-		makeGraphic(Std.int(def.width), Std.int(def.height), FlxColor.PINK, true);
-		alpha = .2;
+		makeGraphic(Std.int(def.width), Std.int(def.height), FlxColor.TRANSPARENT, true);
 		x = def.x;
 		y = def.y;
 	}

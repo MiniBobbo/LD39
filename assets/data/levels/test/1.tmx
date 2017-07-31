@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="2017.05.26" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="32" tileheight="32" nextobjectid="16">
+<map version="2017.05.26" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="32" tileheight="32" nextobjectid="17">
  <tileset firstgid="1" name="32blocks" tilewidth="32" tileheight="32" tilecount="10" columns="10">
   <image source="../../../../../../../Pictures/Games/32blocks.png" width="320" height="32"/>
  </tileset>
- <tileset firstgid="11" name="forestTiles" tilewidth="32" tileheight="32" tilecount="900" columns="30">
-  <image source="forestTiles.png" width="960" height="960"/>
+ <tileset firstgid="11" name="CombinedTiles" tilewidth="32" tileheight="32" tilecount="60" columns="20">
+  <image source="../CombinedTiles.png" width="640" height="96"/>
  </tileset>
  <objectgroup name="Object Layer 1">
   <object id="1" name="spawn" x="48" y="300" width="10" height="10"/>
@@ -17,25 +17,25 @@
   <object id="9" name="d" type="6" x="42" y="101" width="15" height="15"/>
   <object id="10" name="appear" x="362" y="136" width="14" height="16"/>
   <object id="12" name="text" type="Use WASD or Arrow Keys to move" x="2" y="184" width="156" height="150"/>
-  <object id="14" name="cutscene" type="welcome" x="174" y="187" width="198" height="191"/>
+  <object id="14" name="cutscene" type="start" x="16" y="150" width="198" height="191"/>
  </objectgroup>
  <layer name="bg" width="20" height="15">
   <data encoding="csv">
-73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,73,43,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,42,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,42,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,42,
-14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,42,
-44,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,42,
-44,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,42,
-44,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,42,
-44,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,42,
-44,0,0,0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,72,
-43,43,43,43,44,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-43,43,43,43,44,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-43,43,43,43,43,13,13,13,14,0,0,0,0,0,0,0,0,0,0,0,
-43,43,43,43,43,43,43,43,43,13,13,13,13,14,0,12,13,13,13,13,
-43,43,43,43,43,43,43,43,43,43,43,43,43,44,0,42,43,43,43,43
+53,53,53,53,53,53,53,53,53,53,53,53,53,53,53,53,53,53,53,33,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,
+14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,
+34,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,
+34,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,
+34,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,
+34,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,
+34,0,0,0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,52,
+33,33,33,33,34,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+33,33,33,33,34,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+33,33,33,33,33,13,13,13,14,0,0,0,0,0,0,0,0,0,0,0,
+33,33,33,33,33,33,33,33,33,13,13,13,13,14,0,12,13,13,13,13,
+33,33,33,33,33,33,33,33,33,33,33,33,33,34,0,32,33,33,33,33
 </data>
  </layer>
  <layer name="collision" width="20" height="15" opacity="0.2">

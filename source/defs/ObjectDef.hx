@@ -5,6 +5,7 @@ enum ObjectTypes {
 	ROBOT;
 	SPIKED;
 	SPAWN;
+	GENERATOR;
 }
 
 

@@ -6,6 +6,7 @@ import defs.ObjectDef.ObjectTypes;
 import defs.TriggerDef.TriggerTypes;
 import entities.Block;
 import entities.Explosion;
+import entities.Generator;
 import entities.Object;
 import entities.Player;
 import entities.SpikedRobot;
@@ -92,16 +93,6 @@ class TestState extends FlxState
 		H.ALLOW_INPUT = true;
 		H.PAUSED = true;
 		//Create the map for the level we are on.
-		try{
-			map = new TmxTools(H.MAP_LOCATION + H.gs.currentLevel + '.tmx', H.MAP_LOCATION, H.MAP_LOCATION);
-			collision = map.getMap('collision');
-			collision.setTileProperties(0, FlxObject.NONE);
-			bg = map.getMap('bg');
-			
-		} catch (err:Dynamic)
-		{
-			FlxG.log.add(err);
-		}
 		map = new TmxTools(H.MAP_LOCATION + H.gs.currentLevel + '.tmx', H.MAP_LOCATION, H.MAP_LOCATION);
 		collision = map.getMap('collision');
 		collision.setTileProperties(0, FlxObject.NONE);
@@ -109,6 +100,7 @@ class TestState extends FlxState
 		//mg = map.getMap('mg');
 		//fg = map.getMap('fg');
 		
+		loadSounds(); 
 		
 		//Create the game objects
 		player = new Player();
@@ -147,7 +139,7 @@ class TestState extends FlxState
 		add(effects);
 		//if (fg != null)
 		//add(fg);
-		add(collision);
+		//add(collision);
 		collision.alpha = .3;
 		add(hud);
 		add(triggers);
@@ -165,6 +157,7 @@ class TestState extends FlxState
 			//After the camera fades in, wait some time, flash the spawn, show the player, and start the game.
 				H.PAUSED = false; 
 				FlxG.camera.flash(FlxColor.WHITE, .1);
+				FlxG.sound.play('assets/sounds/spawnProbe.wav');
 				player.alpha = 1;
 			});
 				
@@ -276,23 +269,30 @@ class TestState extends FlxState
 			FlxG.camera.fade(FlxColor.BLACK, H.FADE_TIME, false, function() { nextLevel(); });
 		}
 		else if (Std.is(trigger, PuJump)) {
-			var j = cast(trigger, PuJump);
-			trigger.kill();
-			H.gs.powerupsThis.set('jump', true);
+			if(!H.gs.powerupsThis.get('jump')) {
+				FlxG.camera.flash(FlxColor.WHITE, .2);
+				var j = cast(trigger, PuJump);
+				j.visible = false;
+				H.gs.powerupsThis.set('jump', true);
+			}
 		}
 		else if (Std.is(trigger, PuBomb)) {
-			var j = cast(trigger, PuBomb);
-			trigger.kill();
-			H.gs.powerupsThis.set('bomb', true);
+			if(!H.gs.powerupsThis.get('bomb')) {
+				FlxG.camera.flash(FlxColor.WHITE, .2);
+				var j = cast(trigger, PuBomb);
+				j.visible = false;
+				H.gs.powerupsThis.set('bomb', true);
+			}
 		}
 		else if (Std.is(trigger, PuSpeed)) {
 			var j = cast(trigger, PuSpeed);
-			trigger.kill();
+			j.visible = false;
 			H.gs.powerupsThis.set('speed', true);
 			player.setSpeed();
 		}
 		else if (Std.is(trigger, PuSpike)) {
-			trigger.kill();
+			var j = cast(trigger, PuSpike);
+			j.visible = false;
 			H.gs.powerupsThis.set('spike', true);
 			player.setSpeed();
 		} else if (Std.is(trigger, TrText )) {
@@ -385,6 +385,7 @@ class TestState extends FlxState
 				var explode = new Explosion(FlxPoint.weak(player.x + player.width / 2, player.y + player.height / 2));
 				player.visible = false;
 				add(explode);
+				FlxG.sound.play('assets/sounds/explode.wav');
 				FlxG.overlap(explode, objects, hitObject);
 				FlxTween.tween(explode, {alpha:0});
 				new FlxTimer().start(1.2, function(_) {
@@ -415,26 +416,26 @@ class TestState extends FlxState
 			player.fsm = PlayerStates.POWER_DOWN;
 		else if (player.fsm == PlayerStates.SPIKED)
 			player.fsm = PlayerStates.POWER_DOWN_SPIKED;
-			
-			//Create the new def for the powered down robot.
-			var od:ObjectDef = {
-				x:player.x,
-				y:player.y,
-				type:ObjectTypes.ROBOT
-			};
-			//If we are spiked, make a spiked robot instead.
-			if (player.fsm == PlayerStates.POWER_DOWN_SPIKED) {
-				od.type = ObjectTypes.SPIKED;
-				od.data = player.flipX + '';
-			}
-			var pd = new PoweredDown(od);
-			pd.visible = false;
-			objects.add(pd);
+			//
+			////Create the new def for the powered down robot.
+			//var od:ObjectDef = {
+				//x:player.x,
+				//y:player.y,
+				//type:ObjectTypes.ROBOT
+			//};
+			////If we are spiked, make a spiked robot instead.
+			//if (player.fsm == PlayerStates.POWER_DOWN_SPIKED) {
+				//od.type = ObjectTypes.SPIKED;
+				//od.data = player.flipX + '';
+			//}
+			//var pd = new PoweredDown(od);
+			//pd.visible = false;
+			//objects.add(pd);
 		new FlxTimer().start(2, function(_) {
-							var p = FlxPoint.weak(player.x, player.y);
+							//var p = FlxPoint.weak(player.x, player.y);
 							//player.x = -1000;
-							pd.x = p.x;
-							pd.y = p.y;
+							//pd.x = p.x;
+							//pd.y = p.y;
 							H.resetPlayer();
 							nextLevel();
 								
@@ -460,6 +461,9 @@ class TestState extends FlxState
 		
 		if (Std.is(p, Explosion) && cast(o, Object).def.type == ObjectTypes.BLOCK) {
 			o.kill();
+		}
+		if (Std.is(p, Explosion) && cast(o, Object).def.type == ObjectTypes.GENERATOR) {
+			FlxG.switchState(new WinState());
 		}
 		
 		if (Std.is(o, PoweredDown) || Std.is(o, Block) || Std.is(o, SpikedRobot)) {
@@ -524,7 +528,7 @@ class TestState extends FlxState
 						height:o.r.height,
 						data:o.type,
 						type:TriggerTypes.DESTINATION });
-					case 'u':
+					case 'upgrade':
 						var p = H.roundToNearestTile(o.r.x, o.r.y); 
 						levelDef.triggers.push( {
 						x:p.x,
@@ -540,7 +544,13 @@ class TestState extends FlxState
 						x:p.x,
 						y:p.y,
 						type:ObjectTypes.BLOCK});
-					
+					case 'generator':
+						var p = H.roundToNearestTile(o.r.x, o.r.y); 
+						levelDef.objects.push( {
+						x:p.x,
+						y:p.y,
+						type:ObjectTypes.GENERATOR});
+						
 					default:
 						
 				}
@@ -567,6 +577,9 @@ class TestState extends FlxState
 				case ObjectTypes.SPIKED:
 					var s = new SpikedRobot(obj);
 					robotObjs.push(s);
+				case ObjectTypes.GENERATOR:
+					var b = new Generator(obj);
+					objects.add(b);
 				default:
 			}
 			FlxG.watch.add(robotObjs, 'length');
@@ -594,7 +607,26 @@ class TestState extends FlxState
 				case TriggerTypes.DESTINATION:
 					triggers.add(new Destination(t));
 				case TriggerTypes.UPGRADE:
-					
+					//Figure out which upgrade this is.
+					FlxG.log.add('Trying to create pickup ' + t.data);
+					switch (t.data) 
+					{
+						case 'jump':
+							if(!H.gs.powerupsThis.get('jump'))
+							triggers.add(new PuJump(t));
+						case 'bomb':
+							if(!H.gs.powerupsThis.get('bomb'))
+							triggers.add(new PuBomb(t));
+						case 'speed':
+							if(!H.gs.powerupsThis.get('speed'))
+							triggers.add(new PuSpeed(t));
+						case 'spike':
+							if(!H.gs.powerupsThis.get('spike'))
+							triggers.add(new PuSpike(t));
+						default:
+							
+					}
+
 					
 				default:
 					
@@ -619,6 +651,22 @@ class TestState extends FlxState
 		for (t in triggers) {
 			if (t.alive)
 			levelDef.triggers.push(t.def);
+		}
+		
+		//If the robot is powered down, add it as an object as a special case.
+		if(player.fsm == PlayerStates.POWER_DOWN || player.fsm == PlayerStates.POWER_DOWN_SPIKED) {
+			//Create the new def for the powered down robot.
+			var od:ObjectDef = {
+				x:player.x,
+				y:player.y,
+				type:ObjectTypes.ROBOT,
+				data:player.flipX + ''
+			};
+			//If we are spiked, make a spiked robot instead.
+			if (player.fsm == PlayerStates.POWER_DOWN_SPIKED) {
+				od.type = ObjectTypes.SPIKED;
+			}
+			levelDef.objects.push(od);
 		}
 	}
 	
@@ -654,6 +702,7 @@ class TestState extends FlxState
 				//Wait a second, then scan and destroy the robot.
 				new FlxTimer().start(.5, function(_) {
 					FlxG.camera.flash(FlxColor.WHITE, .1);
+					FlxG.sound.play('assets/sounds/downloadProbe.wav');
 					flash.reset(spawn.x, spawn.y);
 					//TODO: Flash sfx here.
 					flash.velocity.y = -1000;
@@ -669,6 +718,15 @@ class TestState extends FlxState
 				
 				} );
 			} });
+	}
+	
+	private function loadSounds() {
+		FlxG.sound.load('assets/sounds/spawnProbe.wav');
+		FlxG.sound.load('assets/sounds/explode.wav');
+		FlxG.sound.load('assets/sounds/shock.wav');
+		FlxG.sound.load('assets/sounds/downloadProbe.wav');
+		FlxG.sound.load('assets/sounds/pickup.wav');
+		FlxG.sound.load('assets/sounds/spike.wav');
 	}
 
 }

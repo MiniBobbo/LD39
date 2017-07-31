@@ -5,8 +5,11 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxSubState;
 import flixel.addons.text.FlxTypeText;
+import flixel.graphics.frames.FlxAtlasFrames;
+import flixel.group.FlxSpriteGroup;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
+import flixel.util.FlxSpriteUtil;
 import inputhelper.InputHelper;
 import logs.Logger;
 
@@ -20,37 +23,43 @@ class CutsceneSubState extends FlxSubState
 	var t:FlxTypeText;
 	var messages:Array<String>;
 	
+	var g:FlxSpriteGroup;
+	
 	
 	public function new(cutsceneName:String) 
 	{
 		super();
-		var bg = new FlxSprite();
-		bg.makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
-		bg.alpha = 0;
-		add(bg);
-		FlxTween.tween(bg, {alpha:.4}, .5);
 		csd = H.cutscenes.get(cutsceneName);
 		messages = csd.messages.copy();
-		Logger.addLog('cutscene', 'messages: ' + messages.toString(), 1);
 		
 	}
 	
 	override public function create():Void 
 	{
 		super.create();
-		t = new FlxTypeText(0, 0, 500, 'THIS IS A TEST', 16, true);
-		t.screenCenter();
-		t.y -= 200;
-		t.x -= 250;
+		g = new FlxSpriteGroup();
+		g.scrollFactor.set();
+		var bg = new FlxSprite();
+		
+		bg.frames = FlxAtlasFrames.fromTexturePackerJson('assets/images/atlas.png', 'assets/images/atlas.json');
+		bg.y = 0;
+		bg.animation.addByPrefix('screen', 'screen', 1, false);
+		bg.animation.play('screen');
+		//bg.centerOffsets();
+		g.add(bg);
+
+		t = new FlxTypeText(35, 55, 500, 'THIS IS A TEST', 16, true);
 		t.delay = H.TYPETEXT_DELAY;
 		t.showCursor = true;
 		t.cursorBlinkSpeed = 1.0;
 		t.sounds = [
-		FlxG.sound.load('assets/sounds/type1.wav'),
-		FlxG.sound.load('assets/sounds/type2.wav')
+		FlxG.sound.load('assets/sounds/type1.wav', 0.3),
+		FlxG.sound.load('assets/sounds/type2.wav', 0.3)
 		];
 		
-		add(t);
+		g.add(t);
+		add(g);
+		//g.screenCenter();
 		//t.start();
 		nextMessage();
 	}
@@ -60,6 +69,10 @@ class CutsceneSubState extends FlxSubState
 		super.update(elapsed);
 		InputHelper.updateKeys(elapsed);
 		if (InputHelper.isButtonJustPressed('jump')) {
+			nextMessage();
+		}
+		if (FlxG.keys.justPressed.ESCAPE) {
+			messages = [];
 			nextMessage();
 		}
 		

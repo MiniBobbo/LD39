@@ -1,11 +1,13 @@
 package entities;
 
+import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.input.FlxAccelerometer;
 import flixel.system.FlxAssets.FlxGraphicAsset;
 import flixel.util.FlxColor;
 import inputhelper.InputHelper;
+import logs.Logger;
 
 enum PlayerStates {
 	NORMAL;
@@ -140,6 +142,11 @@ class Player extends Entity
 	
 	function getInputs(elapsed:Float, energySpent:Float):Float
 	{
+		if (FlxG.keys.justPressed.M) {
+			Logger.addLog('player upgrades', '' + H.gs.powerupsThis.toString(), 1);
+		}
+		
+		
 		//First, check if we used the spike
 		if (I.isButtonJustPressed('action')) {
 			//If we are spiked, return to normal

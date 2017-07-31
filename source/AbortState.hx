@@ -2,6 +2,7 @@ package;
 
 import flixel.FlxSubState;
 import flixel.group.FlxGroup.FlxTypedGroup;
+import flixel.group.FlxSpriteGroup;
 import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
 
@@ -11,7 +12,7 @@ import flixel.util.FlxColor;
  */
 class AbortState extends FlxSubState 
 {
-	var ui:FlxTypedGroup<FlxButton>;
+	var ui:FlxSpriteGroup;
 	
 	public function new(BGColor:FlxColor=FlxColor.TRANSPARENT) 
 	{
@@ -22,26 +23,40 @@ class AbortState extends FlxSubState
 	override public function create():Void 
 	{
 		super.create();
-		ui = new FlxTypedGroup<FlxButton>();
+		ui = new FlxSpriteGroup();
 		//Count the number of buttons
 		var buttonCount:Int = 0;
 			var disentigrateButton = new FlxButton(0, 40 * buttonCount, 'Disentigrate', disentigrate);
+			disentigrateButton.label.size = 20;
+			disentigrateButton.makeGraphic(200,50,FlxColor.BLUE);
+			disentigrateButton.label.color = FlxColor.WHITE;
 			ui.add(disentigrateButton);
 			buttonCount++;
 
-		var powerDownButton = new FlxButton(0, 40 * buttonCount, 'Power Down', powerDown);
+		var powerDownButton = new FlxButton(0, 60 * buttonCount, 'Power Down', powerDown);
+			powerDownButton.label.size = 20;
+			powerDownButton.makeGraphic(200,50,FlxColor.BLUE);
+			powerDownButton.label.color = FlxColor.WHITE;
 		ui.add(powerDownButton);
 		buttonCount++;
 		if (H.gs.powerupsThis.get('bomb')) {
-			var bombButton = new FlxButton(0, 40 * buttonCount, 'Explode', explode);
+			var bombButton = new FlxButton(0, 60 * buttonCount, 'Explode', explode);
+			bombButton.label.size = 20;
+			bombButton.label.color = FlxColor.WHITE;
+			bombButton.makeGraphic(200,50,FlxColor.BLUE);
 			ui.add(bombButton);
 			buttonCount++;
 		}
 		
 		
-		var cancelButton = new FlxButton(0, 40 * buttonCount, "Cancel", cancel);
+		var cancelButton = new FlxButton(0, 60 * buttonCount, "Cancel", cancel);
+			cancelButton.label.size = 20;
+			cancelButton.makeGraphic(200,50,FlxColor.BLUE);
+			cancelButton.label.color = FlxColor.WHITE;
 		ui.add(cancelButton);
-		
+		ui.x = 300;
+		ui.y = 100;
+		ui.scrollFactor.set();
 		
 		add(ui);
 	}

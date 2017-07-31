@@ -23,7 +23,7 @@ class PoweredDown extends Object
 		frames = atlasFrames;
 		animation.addByNames('powered down', ['robot_powerdown_124.png'], 1, false);
 		animation.play('powered down');
-		setSize(30, 20);
+		setSize(30, 30);
 		this.centerOffsets();
 
 		x = objectDef.x;

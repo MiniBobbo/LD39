@@ -19,7 +19,7 @@ class PuJump extends Trigger
 		var atlasFrames  = FlxAtlasFrames.fromTexturePackerJson('assets/images/atlas.png', 'assets/images/atlas.json');
 		frames = atlasFrames;
 		animation.addByPrefix('go', 'powerup', 12, true);
-		//animation.play('go');
+		animation.play('go');
 		angularVelocity = 180;
 	}
 	

@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="2017.05.26" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="32" tileheight="32" nextobjectid="17">
+<map version="2017.05.26" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="32" tileheight="32" nextobjectid="18">
  <tileset firstgid="1" name="32blocks" tilewidth="32" tileheight="32" tilecount="10" columns="10">
   <image source="../../../../../../../Pictures/Games/32blocks.png" width="320" height="32"/>
+ </tileset>
+ <tileset firstgid="11" name="CombinedTiles" tilewidth="32" tileheight="32" tilecount="60" columns="20">
+  <image source="../CombinedTiles.png" width="640" height="96"/>
  </tileset>
  <layer name="collision" width="20" height="15">
   <data encoding="csv">
@@ -26,5 +29,25 @@
   <object id="13" name="travel" type="4" x="5" y="197" width="21" height="50"/>
   <object id="14" name="d" type="4" x="41" y="232" width="11" height="15"/>
   <object id="16" name="upgrade" type="spike" x="490" y="421" width="15" height="16"/>
+  <object id="17" name="text" type="Press Enter when against a wall to stick to it.  Your action menu is still available while you are sticking." x="414" y="383" width="164" height="65"/>
  </objectgroup>
+ <layer name="bg" width="20" height="15">
+  <data encoding="csv">
+33,53,53,53,53,53,53,53,53,53,53,53,53,53,53,53,53,53,53,33,
+34,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,
+34,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,
+34,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,
+34,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,
+54,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,
+13,13,13,13,13,13,13,14,0,0,0,0,0,0,0,0,0,0,0,32,
+33,33,33,33,33,33,33,34,0,0,0,0,0,0,0,0,0,0,0,32,
+33,33,33,33,33,33,33,34,0,0,0,0,0,0,0,0,0,0,0,32,
+33,33,33,33,33,33,33,34,0,0,0,0,0,0,0,0,0,0,0,32,
+33,33,33,33,33,33,33,34,0,0,0,0,0,0,0,0,0,0,0,32,
+33,33,33,33,33,33,33,34,0,0,0,0,0,0,0,0,0,0,0,32,
+33,33,33,33,33,33,33,33,13,13,13,13,13,13,13,13,13,13,13,33
+</data>
+ </layer>
 </map>

@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="2017.05.26" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="32" tileheight="32" nextobjectid="12">
+<map version="2017.05.26" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="32" tileheight="32" nextobjectid="14">
  <tileset firstgid="1" name="32blocks" tilewidth="32" tileheight="32" tilecount="10" columns="10">
   <image source="../../../../../../../Pictures/Games/32blocks.png" width="320" height="32"/>
+ </tileset>
+ <tileset firstgid="11" name="CombinedTiles" tilewidth="32" tileheight="32" tilecount="60" columns="20">
+  <image source="../CombinedTiles.png" width="640" height="96"/>
  </tileset>
  <layer name="collision" width="20" height="15">
   <data encoding="csv">
@@ -27,5 +30,26 @@
   <object id="4" name="d" type="2" x="44" y="391" width="10" height="10"/>
   <object id="8" name="upgrade" type="bomb" x="555" y="366" width="10" height="3"/>
   <object id="11" name="blocks" type="break" x="168" y="393.5" width="16" height="15"/>
+  <object id="12" name="cutscene" type="bomb" x="419" y="389" width="183" height="20"/>
+  <object id="13" name="text" type="Press Q to open your action menu.  Select Explode to destroy the block (and the probe, but we can make more)" x="224" y="351" width="129" height="73"/>
  </objectgroup>
+ <layer name="bg" width="20" height="15">
+  <data encoding="csv">
+33,53,53,53,53,53,53,53,53,53,53,53,53,53,53,53,53,53,53,33,
+34,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,
+34,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,
+34,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,
+34,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,
+34,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,
+34,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,
+34,0,0,0,0,0,0,0,12,13,13,13,13,13,14,0,0,0,0,32,
+34,0,0,0,0,0,0,0,32,33,33,33,33,33,34,0,0,0,0,32,
+54,0,0,0,0,0,12,13,33,33,33,33,33,33,34,0,0,0,0,32,
+0,0,0,0,0,0,32,53,53,53,53,53,53,53,54,0,0,0,0,32,
+0,0,0,0,0,12,54,0,0,0,0,0,0,0,0,0,0,0,0,32,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32,
+13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,33,
+33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33,33
+</data>
+ </layer>
 </map>

@@ -86,7 +86,7 @@ class GS
 	 * @return	True if it is.  Otherwise false
 	 */
 	public function firstTimeInLevel(level:String):Bool {
-		Logger.addLog('LevelDef check', 'Is level ' + level + ' in def list? ' + levelDefs.toString(),2);
+		Logger.addLog('LevelDef check', 'Is level ' + level + ' in def list? ' + levelDefs.toString());
 		return !levelDefs.exists(level);
 	}
 	
